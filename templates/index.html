@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberBot</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+    input[type="text"] { width: 80%; padding: 10px; }
+    button { padding: 10px; }
+    .user { font-weight: bold; color: #1a73e8; }
+    .bot { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>CyberBot Assistant</h1>
+  <div id="chat"></div>
+  <input type="text" id="message" placeholder="Ask a question..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("message");
+      const chat = document.getElementById("chat");
+      const msg = input.value;
+      if (!msg) return;
+
+      chat.innerHTML += `<div class="user">You: ${msg}</div>`;
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await res.json();
+      chat.innerHTML += `<div class="bot">🤖 CyberBot: ${data.reply}</div>`;
+      input.value = "";
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
