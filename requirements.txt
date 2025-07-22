@@ -32,3 +32,4 @@ pandas
 openai
 python-dotenv
 flask
+openpyxl
