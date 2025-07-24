@@ -1,42 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CyberBot</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
-    input[type="text"] { width: 80%; padding: 10px; }
-    button { padding: 10px; }
-    .user { font-weight: bold; color: #1a73e8; }
-    .bot { margin-bottom: 10px; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberClinic Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+        .chat-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .chat-log {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #fafafa;
+            margin-bottom: 10px;
+        }
+        .chat-log div {
+            margin-bottom: 8px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 1rem;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>CyberBot Assistant</h1>
-  <div id="chat"></div>
-  <input type="text" id="message" placeholder="Ask a question..." />
-  <button onclick="sendMessage()">Send</button>
+    <div class="chat-container">
+        <h2>CyberClinic Bot</h2>
+        <div class="chat-log" id="chat-log"></div>
+        <div>
+            <input type="text" id="user-input" placeholder="Type your message here..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
-  <script>
-    async function sendMessage() {
-      const input = document.getElementById("message");
-      const chat = document.getElementById("chat");
-      const msg = input.value;
-      if (!msg) return;
+    <!-- Teams SDK (optional) -->
+    <script src="https://res.cdn.office.net/teams-js/2.0.0/js/MicrosoftTeams.min.js"></script>
+    <script>
+        microsoftTeams.app.initialize().then(() => {
+            console.log("Teams tab initialized");
+        });
+    </script>
 
-      chat.innerHTML += `<div class="user">You: ${msg}</div>`;
+    <script>
+        function appendMessage(sender, message) {
+            const log = document.getElementById('chat-log');
+            const msg = document.createElement('div');
+            msg.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            log.appendChild(msg);
+            log.scrollTop = log.scrollHeight;
+        }
 
-      const res = await fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg })
-      });
-      const data = await res.json();
-      chat.innerHTML += `<div class="bot">🤖 CyberBot: ${data.reply}</div>`;
-      input.value = "";
-      chat.scrollTop = chat.scrollHeight;
-    }
-  </script>
+        async function sendMessage() {
+            const input = document.getElementById("user-input");
+            const userMessage = input.value.trim();
+            if (!userMessage) return;
+
+            appendMessage("You", userMessage);
+            input.value = "";
+
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage }),
+            });
+
+            const data = await response.json();
+            appendMessage("CyberClinic Bot", data.reply);
+        }
+    </script>
 </body>
 </html>

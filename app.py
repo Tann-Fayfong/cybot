@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template
 from cyberbot import CyberBot
-from botbuilder.core import TurnContext
 import os
 import pandas as pd
 import openai
@@ -13,6 +12,13 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Flask app
 app = Flask(__name__)
 bot = CyberBot()
+
+# Allow Teams to embed in iframe
+@app.after_request
+def add_iframe_headers(response):
+    response.headers['X-Frame-Options'] = 'ALLOWALL'
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' teams.microsoft.com *.teams.microsoft.com"
+    return response
 
 @app.route("/")
 def index():
